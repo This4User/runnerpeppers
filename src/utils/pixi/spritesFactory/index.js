@@ -1,7 +1,13 @@
 import * as PIXI from "pixi.js";
+import AbstractFactory from "../../abstractFactory";
 
-class SpritesFactory {
+class SpritesFactory extends AbstractFactory {
 	enemies = [];
+
+	getItem(name, options) {
+		super.getItem(name, options);
+
+	}
 
 	getHero(texture) {
 		if (!this.hero) {
