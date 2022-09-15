@@ -6,7 +6,7 @@ function App() {
 
 	useEffect(() => {
 		let game;
-		import("../../utils/pixi/index")
+		import("../../Game")
 			.then((module) => {
 				game = new module.Game(root.current);
 			});

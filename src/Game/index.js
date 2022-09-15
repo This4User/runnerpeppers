@@ -1,13 +1,13 @@
 import * as PIXI from "pixi.js";
-import hero from "../../assets/hero.png";
-import wave from "../../assets/wave.png";
-import hole from "../../assets/enemies/enemy_2.png";
-import snowHole from "../../assets/enemies/enemy_1.png";
-import {hitTest} from "./hitTest";
-import {LevelGenerator} from "../levelGenerator";
+import hero from "../assets/hero.png";
+import wave from "../assets/wave.png";
+import hole from "../assets/enemies/enemy_2.png";
+import snowHole from "../assets/enemies/enemy_1.png";
+import {hitTest} from "../utils/hitTest";
+import {LevelGenerator} from "../utils/levelGenerator";
 import spritesFactory from "./spritesFactory";
 import {nanoid} from "@reduxjs/toolkit";
-import swipesTracker from "../swipesTracker";
+import swipesTracker from "../utils/swipesTracker";
 
 export class Game {
 	holes = [];
@@ -41,14 +41,14 @@ export class Game {
 		swipesTracker.addRightSwipeEvent(() => {
 			if (this.heroLine + 1 < this.lines.length) {
 				this.heroLine += 1;
-				this.heroSprite.x = this.lines[this.heroLine];
+				this.hero.item.x = this.lines[this.heroLine];
 			}
 		});
 
 		swipesTracker.addLeftSwipeEvent(() => {
 			if (this.heroLine - 1 >= 0) {
 				this.heroLine -= 1;
-				this.heroSprite.x = this.lines[this.heroLine];
+				this.hero.item.x = this.lines[this.heroLine];
 			}
 		});
 	}
@@ -87,28 +87,23 @@ export class Game {
 	}
 
 	initHero(texture) {
-		this.heroSprite = spritesFactory.getHero(texture);
-		this.heroSprite.interactive = true;
-		this.heroSprite.zIndex = 10;
-
-		this.heroSprite.on("click", () => {
-			this.heroSprite.y -= 64;
-		});
-
+		this.hero = spritesFactory.getHero(texture);
+		this.hero.item.interactive = true;
+		this.hero.item.zIndex = 10;
 		this.heroLine = Math.floor(Math.random() * this.lines.length);
-		this.heroSprite.x = this.lines[this.heroLine];
-		this.heroSprite.y = this.app.renderer.height - this.heroSprite.height * 3;
+		this.hero.item.x = this.lines[this.heroLine];
+		this.hero.item.y = this.app.renderer.height - this.hero.item.height * 3;
 
-		this.heroSprite.anchor.x = 0.5;
-		this.heroSprite.scale.x *= -1;
+		this.hero.item.anchor.x = 0.5;
+		this.hero.item.scale.x *= -1;
 
-		this.app.stage.addChild(this.heroSprite);
+		this.app.stage.addChild(this.hero.item);
 		this.isHeroFlipped = true;
 	}
 
 	heroAnimation() {
 		if (this.isHeroFlipped) {
-			this.heroSprite.scale.x *= -1;
+			this.hero.item.scale.x *= -1;
 			this.isHeroFlipped = false;
 			setTimeout(() => {
 				this.isHeroFlipped = true;
@@ -135,23 +130,20 @@ export class Game {
 					const texture = Math.random() < 0.5 ? hole : snowHole;
 					const holeSprite = spritesFactory.getEnemy(texture);
 
-					holeSprite.anchor.x = 0.5;
-					holeSprite.x = this.lines[cellIndex];
-					holeSprite.y = -holeSprite.height;
+					holeSprite.item.anchor.x = 0.5;
+					holeSprite.item.x = this.lines[cellIndex];
+					holeSprite.item.y = -holeSprite.item.height;
 
-					this.holes.push({
-						id: nanoid(),
-						model: holeSprite
-					});
+					this.holes.push(holeSprite);
 
-					this.app.stage.addChild(holeSprite);
+					this.app.stage.addChild(holeSprite.item);
 				}
 			});
 		});
 	};
 
 	updateGreed() {
-		if (this.holes[this.holes.length - 1].model.y > this.app.renderer.height / 3) {
+		if (this.holes[this.holes.length - 1].item.y > this.app.renderer.height / 3) {
 			const newBrick = this.generator.getBrick();
 			this.greed.pop();
 			this.greed.push(newBrick);
@@ -161,19 +153,19 @@ export class Game {
 
 	collectEnemies() {
 		this.holes.forEach(hole => {
-			if (hole.model.y > this.app.renderer.height + hole.model.height) {
+			if (hole.item.y > this.app.renderer.height + hole.item.height) {
 
-				spritesFactory.returnEnemy(hole.model);
+				spritesFactory.returnEnemy(hole);
 				this.holes = this.holes.filter(({id}) => id !== hole.id);
-				this.app.stage.removeChild(hole.model);
+				this.app.stage.removeChild(hole.item);
 			}
 		});
 	}
 
 	moveEnemies() {
 		this.holes.forEach((hole) => {
-			hole.model.y += 2;
-			if (hitTest(this.heroSprite, hole.model)) {
+			hole.item.y += 2;
+			if (hitTest(this.hero.item, hole.item)) {
 				console.log("Loose");
 			}
 		});
