@@ -1,4 +1,6 @@
 class SwipesTracker {
+	isMouseDown = false;
+
 	addTargetElement(targetElement) {
 		this.target = targetElement;
 		this.target.addEventListener("touchstart", this.handleTouchStart);
@@ -11,7 +13,9 @@ class SwipesTracker {
 
 	handleTouchStart = (e) => {
 		e.preventDefault();
+		e.stopPropagation();
 		if (e.type === "mousedown") {
+			this.isMouseDown = true;
 			this.xDown = e.clientX;
 		} else {
 			this.xDown = e.touches[0].clientX;
@@ -28,23 +32,31 @@ class SwipesTracker {
 
 	handleTouchMove = (e) => {
 		e.preventDefault();
-		let xUp;
-		if (e.type === "mousemove") {
-			xUp = e.clientX;
-		} else {
-			xUp = e.touches[0].clientX;
+		e.stopPropagation();
+		if (this.isMouseDown) {
+			let xUp;
+			if (e.type === "mousemove") {
+				xUp = e.clientX;
+			} else {
+				xUp = e.touches[0].clientX;
+			}
+
+			this.xDiff = this.xDown - xUp;
 		}
-		this.xDiff = this.xDown - xUp;
 	};
 
-	handleTouchEnd = () => {
-		if (this.xDiff > 0) {
-			console.log("Left");
-			this.leftSwipeEvent();
-		} else {
-			console.log("Right");
-			this.rightSwipeEvent();
+	handleTouchEnd = (e) => {
+		e.preventDefault();
+		e.stopPropagation();
+		this.isMouseDown = false;
+		if (this.xDiff !== 0) {
+			if (this.xDiff > 0) {
+				this.leftSwipeEvent();
+			} else {
+				this.rightSwipeEvent();
+			}
 		}
+		this.xDiff = 0;
 	};
 }
 

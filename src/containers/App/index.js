@@ -1,8 +1,15 @@
 import "./index.css";
+import {useSelector, useDispatch} from "react-redux";
 import {useEffect, useRef} from "react";
+import {broadcast} from "../../utils/eventBus";
+import {IN_GAME, PAUSED, RESTART, START} from "../../store/slices/gameSlice/consts";
+import {updateGameState} from "../../store/slices/gameSlice";
 
 function App() {
 	const root = useRef(null);
+	const dispatch = useDispatch();
+	const gameState = useSelector((state) => state.game.current);
+	const distance = useSelector((state) => Math.floor(state.game.distance));
 
 	useEffect(() => {
 		let game;
@@ -16,7 +23,11 @@ function App() {
 		return () => {
 			if (game) game.destroyGame();
 		};
-	});
+	}, []);
+
+	useEffect(() => {
+		console.log(`gameState: ${gameState}`);
+	}, [gameState]);
 
 	return (
 		<div
@@ -24,9 +35,30 @@ function App() {
 			ref={root}
 		>
 			<div
-				className="game"
+				className="game-header"
 			>
-
+				{distance} м
+				<button onClick={(e) => {
+					e.stopPropagation();
+					if (gameState === IN_GAME) {
+						dispatch(updateGameState(PAUSED));
+						broadcast(PAUSED);
+					} else if (gameState === PAUSED) {
+						dispatch(updateGameState(IN_GAME));
+						broadcast(START);
+					}
+				}}>
+					{
+						gameState === IN_GAME ? "Пауза" : "Продолжить"
+					}
+				</button>
+				<button onClick={() => {
+					if (gameState !== IN_GAME) {
+						broadcast(RESTART);
+					}
+				}}>
+					Занаво
+				</button>
 			</div>
 		</div>
 	);

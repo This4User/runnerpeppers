@@ -8,21 +8,21 @@ import {LevelGenerator} from "../../utils/levelGenerator";
 import spritesFactory from "./spritesFactory";
 import swipesTracker from "../../utils/swipesTracker";
 import {store} from "../../store";
-import {updateGameState} from "../../store/slices/gameSlice";
+import {updateDistance, updateGameState} from "../../store/slices/gameSlice";
 import {
 	IN_GAME, INIT_END,
 	INIT_ERROR,
 	INIT_START,
 	LOADING_ASSETS,
 	LOADING_ASSETS_END,
-	LOADING_ERROR, PENDING
+	LOADING_ERROR, LOOSE, PAUSED, PENDING, RESTART, START
 } from "../../store/slices/gameSlice/consts";
 import {broadcast, subscribe} from "../../utils/eventBus";
 import {gameHero} from "./hero";
 import enemies from "./enemies";
 
 class Game {
-	holes = [];
+	isPaused = false;
 
 	addTarget(targetElement) {
 		this.target = targetElement;
@@ -30,6 +30,19 @@ class Game {
 
 	initGame() {
 		this.initCanvas(this.target);
+
+		subscribe(LOOSE, () => {
+			this.isPaused = true;
+			store.dispatch(updateGameState(LOOSE));
+		});
+
+		subscribe(PAUSED, () => {
+			this.isPaused = true;
+		});
+
+		subscribe(START, () => {
+			this.isPaused = false;
+		});
 
 		subscribe(LOADING_ASSETS_END, () => {
 			try {
@@ -53,14 +66,23 @@ class Game {
 			this.initOnResize();
 		});
 
+		subscribe(RESTART, this.restart);
+
 		this.loadAssets();
 	}
 
+	restart = () => {
+		enemies.reset();
+		this.greed = [this.generator.getBrick()];
+		enemies.mapEnemies(this.greed);
+		store.dispatch(updateDistance(0));
+		this.isPaused = false;
+		store.dispatch(updateGameState(IN_GAME));
+	};
+
 	updateGameState(newState) {
-		this.state = newState;
-		console.log(newState);
-		broadcast(newState);
 		store.dispatch(updateGameState(newState));
+		broadcast(newState);
 	}
 
 	initCanvas(targetElement) {
@@ -77,14 +99,14 @@ class Game {
 	initInteraction() {
 		swipesTracker.addTargetElement(this.target);
 		swipesTracker.addRightSwipeEvent(() => {
-			if (this.heroLine + 1 < this.lines.length) {
+			if (!this.isPaused && this.heroLine + 1 < this.lines.length) {
 				this.heroLine += 1;
 				this.hero.item.x = this.lines[this.heroLine];
 			}
 		});
 
 		swipesTracker.addLeftSwipeEvent(() => {
-			if (this.heroLine - 1 >= 0) {
+			if (!this.isPaused && this.heroLine - 1 >= 0) {
 				this.heroLine -= 1;
 				this.hero.item.x = this.lines[this.heroLine];
 			}
@@ -156,12 +178,12 @@ class Game {
 		}
 	}
 
-	updateGreed(textures) {
+	updateGreed() {
 		if (enemies.lastEnemyPosition.y > this.app.renderer.height / 3) {
 			const newBrick = this.generator.getBrick();
 			this.greed.pop();
 			this.greed.push(newBrick);
-			enemies.mapEnemies(textures, this.greed);
+			enemies.mapEnemies(this.greed);
 		}
 	}
 
@@ -170,27 +192,31 @@ class Game {
 			.load((loader, resources) => {
 				this.initHero(resources.hero.texture);
 				this.initDecorations(resources.wave.texture);
-				enemies.mapEnemies({
+				enemies.addTextures({
 					snowHole: resources.snowHole.texture,
 					hole: resources.hole.texture
-				}, this.greed);
+				});
+				enemies.mapEnemies(this.greed);
 
 				this.app.ticker.add(() => {
-					gameHero.heroAnimation();
-					enemies.moveEnemies(this.hero);
-					this.updateGreed({
-						snowHole: resources.snowHole.texture,
-						hole: resources.hole.texture
-					});
-					enemies.collectEnemies(this.app.renderer.height);
+					if (!this.isPaused) {
+						store.dispatch(updateDistance(0.01));
+						gameHero.heroAnimation();
+						enemies.moveEnemies(this.hero);
+						this.updateGreed({
+							snowHole: resources.snowHole.texture,
+							hole: resources.hole.texture
+						});
+						enemies.collectEnemies(this.app.renderer.height);
+					}
 				});
 			});
 	}
 
 	initOnResize() {
 		this.onWindowResize = () => {
-			this.app.view.width = this.target.clientWidth;
-			this.app.view.height = this.target.clientHeight;
+			this.app.view.width = this.target.innerWidth;
+			this.app.view.height = this.target.innerHeight;
 		};
 
 		window.addEventListener("resize", this.onWindowResize);

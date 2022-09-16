@@ -9,6 +9,7 @@ import {
 
 const initialState = {
 	current: PENDING,
+	distance: 0
 };
 
 export const gameStateSlice = createSlice({
@@ -77,11 +78,21 @@ export const gameStateSlice = createSlice({
 					}
 					break;
 			}
+		},
+		updateDistance: (state, action) => {
+			if (action.payload !== 0) {
+				state.distance += action.payload;
+			} else {
+				state.distance = 0;
+			}
 		}
 	},
 });
 
+export const {updateDistance} = gameStateSlice.actions;
+
 export const updateGameState = (newState) => (dispatch) => {
+	console.log(newState);
 	dispatch(gameStateSlice.actions.updateState(newState));
 };
 

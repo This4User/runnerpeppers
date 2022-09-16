@@ -1,12 +1,17 @@
 import spritesFactory from "../spritesFactory";
 import {hitTest} from "../../../utils/hitTest";
-import hole from "../../../assets/enemies/enemy_2.png";
+import {broadcast} from "../../../utils/eventBus";
+import {LOOSE} from "../../../store/slices/gameSlice/consts";
 
 class Enemies {
 	holes = [];
 
 	connectStage(stage) {
 		this.stage = stage;
+	}
+
+	addTextures(textures) {
+		this.textures = textures;
 	}
 
 	addLines(lines) {
@@ -21,11 +26,11 @@ class Enemies {
 		};
 	}
 
-	mapEnemies(textures, greed) {
+	mapEnemies(greed) {
 		greed.forEach((brick) => {
 			brick.forEach((cell, cellIndex) => {
 				if (cell > 0) {
-					const texture = Math.random() < 0.5 ? textures.hole : textures.snowHole;
+					const texture = Math.random() < 0.5 ? this.textures.hole : this.textures.snowHole;
 					const holeSprite = spritesFactory.getEnemy(texture);
 
 					holeSprite.item.anchor.x = 0.5;
@@ -44,7 +49,7 @@ class Enemies {
 		this.holes.forEach((hole) => {
 			hole.item.y += 2;
 			if (hitTest(hero.item, hole.item)) {
-				console.log("Loose");
+				broadcast(LOOSE);
 			}
 		});
 	}
@@ -58,6 +63,13 @@ class Enemies {
 				this.stage.removeChild(hole.item);
 			}
 		});
+	}
+
+	reset() {
+		this.holes.forEach(hole => {
+			this.stage.removeChild(hole.item);
+		});
+		this.holes = [];
 	}
 }
 

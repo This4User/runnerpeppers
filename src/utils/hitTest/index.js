@@ -7,16 +7,16 @@ export const hitTest = (r1, r2) => {
 	hit = false;
 
 	//Find the center points of each sprite
-	r1.centerX = r1.x + r1.width / 2;
-	r1.centerY = r1.y + r1.height / 2;
-	r2.centerX = r2.x + r2.width / 2;
-	r2.centerY = r2.y + r2.height / 2;
+	r1.centerX = r1.x + r1.width / 4;
+	r1.centerY = r1.y + r1.height / 4;
+	r2.centerX = r2.x + r2.width / 4;
+	r2.centerY = r2.y + r2.height / 4;
 
 	//Find the half-widths and half-heights of each sprite
-	r1.halfWidth = r1.width / 2;
-	r1.halfHeight = r1.height / 2;
-	r2.halfWidth = r2.width / 2;
-	r2.halfHeight = r2.height / 2;
+	r1.halfWidth = r1.width / 4;
+	r1.halfHeight = r1.height / 4;
+	r2.halfWidth = r2.width / 4;
+	r2.halfHeight = r2.height / 4;
 
 	//Calculate the distance vector between the sprites
 	vx = r1.centerX - r2.centerX;
@@ -28,7 +28,7 @@ export const hitTest = (r1, r2) => {
 
 	//Check for a collision on the x-axis
 	if (Math.abs(vx) < combinedHalfWidths + 20) {
-		//A collision might be occurring. Check for a collision on the y axis
+		//A collision might be occurring. Check for a collision on the y-axis
 		hit = Math.abs(vy) < combinedHalfHeights;
 	} else {
 		//There's no collision on the x-axis
