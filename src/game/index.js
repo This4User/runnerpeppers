@@ -6,23 +6,47 @@ import snowHole from "../assets/enemies/enemy_1.png";
 import {hitTest} from "../utils/hitTest";
 import {LevelGenerator} from "../utils/levelGenerator";
 import spritesFactory from "./spritesFactory";
-import {nanoid} from "@reduxjs/toolkit";
 import swipesTracker from "../utils/swipesTracker";
+import {store} from "../store";
+import {updateGameState} from "../store/slices/gameSlice";
+import {
+	IN_GAME, INIT_END,
+	INIT_ERROR,
+	INIT_START,
+	LOADING_ASSETS,
+	LOADING_ASSETS_END,
+	LOADING_ERROR
+} from "../store/slices/gameSlice/consts";
 
-export class Game {
+class Game {
 	holes = [];
 
-	constructor(targetElement) {
+	addTarget(targetElement) {
 		this.target = targetElement;
-		this.initCanvas(targetElement);
+	}
+
+	initGame() {
+		this.initCanvas(this.target);
 		this.loadAssets();
-		this.initLevelGenerator();
-		this.initLines();
-		this.initLoader();
-		this.initInteraction();
-		this.initOnResize();
+		try {
+			this.updateGameState(INIT_START);
+			this.initLevelGenerator();
+			this.initLines();
+			this.initLoader();
+			this.initInteraction();
+			this.updateGameState(INIT_END);
+		} catch (error) {
+			this.updateGameState(INIT_ERROR);
+			console.log(error);
+		}
 		this.greed = [this.generator.getBrick()];
 		this.mapEnemies();
+		this.updateGameState(IN_GAME);
+		this.initOnResize();
+	}
+
+	updateGameState(newState) {
+		store.dispatch(updateGameState(newState));
 	}
 
 	initCanvas(targetElement) {
@@ -54,9 +78,18 @@ export class Game {
 	}
 
 	loadAssets() {
-		this.app.loader
-			.add("wave", wave)
-			.add("hero", hero);
+		this.updateGameState(LOADING_ASSETS);
+		try {
+			this.app.loader
+				.add("wave", wave)
+				.add("hero", hero)
+				.add("hole", hole)
+				.add("snowHole", snowHole);
+			this.updateGameState(LOADING_ASSETS_END);
+		} catch (error) {
+			this.updateGameState(LOADING_ERROR);
+			console.log(error);
+		}
 	}
 
 	initLevelGenerator() {
@@ -195,3 +228,5 @@ export class Game {
 		window.addEventListener("resize", this.onWindowResize);
 	}
 }
+
+export default new Game();

@@ -6,9 +6,11 @@ function App() {
 
 	useEffect(() => {
 		let game;
-		import("../../Game")
+		import("../../game")
 			.then((module) => {
-				game = new module.Game(root.current);
+				game = module.default;
+				game.addTarget(root.current);
+				game.initGame();
 			});
 	});
 
