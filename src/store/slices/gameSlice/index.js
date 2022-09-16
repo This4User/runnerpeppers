@@ -49,7 +49,9 @@ export const gameStateSlice = createSlice({
 					}
 					break;
 				case IN_GAME:
-					if (state.current === INIT_END || state.current === PAUSED) {
+					if (state.current === INIT_END
+						|| state.current === PAUSED
+						|| state.current === LOOSE) {
 						state.current = IN_GAME;
 					}
 					break;
@@ -92,7 +94,6 @@ export const gameStateSlice = createSlice({
 export const {updateDistance} = gameStateSlice.actions;
 
 export const updateGameState = (newState) => (dispatch) => {
-	console.log(newState);
 	dispatch(gameStateSlice.actions.updateState(newState));
 };
 

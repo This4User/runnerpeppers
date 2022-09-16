@@ -52,11 +52,14 @@ function App() {
 						gameState === IN_GAME ? "Пауза" : "Продолжить"
 					}
 				</button>
-				<button onClick={() => {
-					if (gameState !== IN_GAME) {
-						broadcast(RESTART);
-					}
-				}}>
+				<button
+					onClick={() => {
+						if (gameState !== IN_GAME) {
+							broadcast(RESTART);
+						}
+					}}
+					disabled={gameState === IN_GAME}
+				>
 					Занаво
 				</button>
 			</div>
