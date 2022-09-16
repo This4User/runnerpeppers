@@ -12,6 +12,10 @@ function App() {
 				game.addTarget(root.current);
 				game.initGame();
 			});
+
+		return () => {
+			if (game) game.destroyGame();
+		};
 	});
 
 	return (

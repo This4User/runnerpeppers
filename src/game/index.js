@@ -15,8 +15,9 @@ import {
 	INIT_START,
 	LOADING_ASSETS,
 	LOADING_ASSETS_END,
-	LOADING_ERROR
+	LOADING_ERROR, PENDING
 } from "../store/slices/gameSlice/consts";
+import {broadcast, subscribe} from "../utils/eventBus";
 
 class Game {
 	holes = [];
@@ -27,25 +28,35 @@ class Game {
 
 	initGame() {
 		this.initCanvas(this.target);
+
+		subscribe(LOADING_ASSETS_END, () => {
+			try {
+				this.updateGameState(INIT_START);
+				this.initLevelGenerator();
+				this.initLines();
+				this.initLoader();
+				this.initInteraction();
+				this.updateGameState(INIT_END);
+			} catch (error) {
+				this.updateGameState(INIT_ERROR);
+				console.log(error);
+			}
+		});
+
+		subscribe(INIT_END, () => {
+			this.greed = [this.generator.getBrick()];
+			this.mapEnemies();
+			this.updateGameState(IN_GAME);
+			this.initOnResize();
+		});
+
 		this.loadAssets();
-		try {
-			this.updateGameState(INIT_START);
-			this.initLevelGenerator();
-			this.initLines();
-			this.initLoader();
-			this.initInteraction();
-			this.updateGameState(INIT_END);
-		} catch (error) {
-			this.updateGameState(INIT_ERROR);
-			console.log(error);
-		}
-		this.greed = [this.generator.getBrick()];
-		this.mapEnemies();
-		this.updateGameState(IN_GAME);
-		this.initOnResize();
 	}
 
 	updateGameState(newState) {
+		this.state = newState;
+		console.log(newState);
+		broadcast(newState);
 		store.dispatch(updateGameState(newState));
 	}
 
@@ -85,6 +96,7 @@ class Game {
 				.add("hero", hero)
 				.add("hole", hole)
 				.add("snowHole", snowHole);
+
 			this.updateGameState(LOADING_ASSETS_END);
 		} catch (error) {
 			this.updateGameState(LOADING_ERROR);
@@ -226,6 +238,14 @@ class Game {
 		};
 
 		window.addEventListener("resize", this.onWindowResize);
+	}
+
+	destroyGame() {
+		this.target.removeChild(this.app.view);
+		this.app.stage.destroy(true);
+		this.app.renderer.destroy(true);
+		this.app = null;
+		this.updateGameState(PENDING);
 	}
 }
 
