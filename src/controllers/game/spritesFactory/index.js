@@ -1,5 +1,5 @@
 import * as PIXI from "pixi.js";
-import AbstractFactory from "../../utils/abstractFactory";
+import AbstractFactory from "../../../utils/abstractFactory";
 import {nanoid} from "@reduxjs/toolkit";
 
 export const HERO = "hero";

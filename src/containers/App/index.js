@@ -6,7 +6,7 @@ function App() {
 
 	useEffect(() => {
 		let game;
-		import("../../game")
+		import("../../controllers/game")
 			.then((module) => {
 				game = module.default;
 				game.addTarget(root.current);
