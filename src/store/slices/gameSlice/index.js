@@ -1,11 +1,8 @@
 import {createSlice} from "@reduxjs/toolkit";
 import {
-	END, IN_GAME, INIT_END,
-	INIT_ERROR, INIT_START,
-	LOADING_ASSETS, LOADING_ASSETS_END,
-	LOADING_ERROR, LOOSE, PAUSED,
-	PENDING, WIN
+	PENDING
 } from "./consts";
+import {stateConfig} from "./stateConfig";
 
 const initialState = {
 	current: PENDING,
@@ -17,7 +14,7 @@ export const gameStateSlice = createSlice({
 	initialState,
 	reducers: {
 		updateState: (state, action) => {
-			switch (action.payload) {
+			/*switch (action.payload) {
 				case LOADING_ASSETS:
 					if (state.current === PENDING) {
 						state.current = LOADING_ASSETS;
@@ -79,8 +76,19 @@ export const gameStateSlice = createSlice({
 						state.current = END;
 					}
 					break;
+			}*/
+			const allowedStates = stateConfig[state.current];
+			const nextState = action.payload;
+
+			if (Array.isArray(allowedStates)) {
+				allowedStates.forEach(stateName => {
+					if (stateName === nextState) state.current = nextState;
+				});
+			} else {
+				if (allowedStates === nextState) state.current = nextState;
 			}
 		},
+
 		updateDistance: (state, action) => {
 			if (action.payload !== 0) {
 				state.distance += action.payload;

@@ -6,8 +6,6 @@ import snowHole from "../../assets/enemies/enemy_1.png";
 import light from "../../assets/decorations/light.png";
 import {LevelGenerator} from "../../utils/levelGenerator";
 import swipesTracker from "../../utils/swipesTracker";
-import {store} from "../../store";
-import {updateDistance, updateGameState} from "../../store/slices/gameSlice";
 import {
 	IN_GAME,
 	INIT_END,
@@ -39,7 +37,6 @@ class Game {
 
 		subscribe(LOOSE, () => {
 			this.isPaused = true;
-			store.dispatch(updateGameState(LOOSE));
 		});
 
 		subscribe(PAUSED, () => {
@@ -52,6 +49,7 @@ class Game {
 
 		subscribe(LOADING_ASSETS_END, () => {
 			try {
+				console.log("awrawrs");
 				this.updateGameState(INIT_START);
 				this.initLevelGenerator();
 				this.initLines();
@@ -81,15 +79,15 @@ class Game {
 		enemies.reset();
 		this.greed = [this.generator.getBrick()];
 		enemies.mapEnemies(this.greed);
-		store.dispatch(updateDistance(0));
+		broadcast("update_distance", 0);
 		this.isPaused = false;
-		store.dispatch(updateGameState(IN_GAME));
+		this.updateGameState(IN_GAME);
 	};
 
-	updateGameState(newState) {
-		store.dispatch(updateGameState(newState));
-		broadcast(newState);
-	}
+	updateGameState = (newState) => {
+		this.state = newState;
+		broadcast("update_state", newState);
+	};
 
 	initCanvas(targetElement) {
 		this.app = new PIXI.Application({
@@ -200,9 +198,9 @@ class Game {
 
 				this.app.ticker.add(() => {
 					if (!this.isPaused) {
-						store.dispatch(updateDistance(0.01));
+						broadcast("update_distance", 0.01);
 						gameHero.heroAnimation();
-						enemies.moveEnemies(this.hero);
+						enemies.moveEnemies(this.hero, this.updateGameState);
 						decorations.moveDecorations();
 						this.updateGreed();
 						this.updateDecorations();

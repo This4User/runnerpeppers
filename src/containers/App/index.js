@@ -1,29 +1,45 @@
 import "./index.css";
 import {useSelector, useDispatch} from "react-redux";
 import {useEffect, useRef} from "react";
-import {broadcast} from "../../utils/eventBus";
-import {IN_GAME, PAUSED, RESTART, START} from "../../store/slices/gameSlice/consts";
-import {updateGameState} from "../../store/slices/gameSlice";
+import {broadcast, subscribe} from "../../utils/eventBus";
+import {IN_GAME, PAUSED, PENDING, RESTART, START} from "../../store/slices/gameSlice/consts";
+import {updateDistance, updateGameState} from "../../store/slices/gameSlice";
 
 function App() {
 	const root = useRef(null);
+	const game = useRef(null);
 	const dispatch = useDispatch();
 	const gameState = useSelector((state) => state.game.current);
 	const distance = useSelector((state) => Math.floor(state.game.distance));
 
 	useEffect(() => {
-		let game;
 		import("../../controllers/game")
 			.then((module) => {
-				game = module.default;
-				game.addTarget(root.current);
-				game.initGame();
+				game.current = module.default;
+				game.current.addTarget(root.current);
+				game.current.initGame();
 			});
 
+		const unsubscribeUpdateState = subscribe("update_state", (nextState) => {
+			console.log(nextState);
+			dispatch(updateGameState(nextState));
+			broadcast(nextState);
+		});
+
+		const unsubscribeUpdateDistance = subscribe("update_distance", (length) => {
+			dispatch(updateDistance(length));
+		});
+
 		return () => {
-			if (game) game.destroyGame();
+			if (game) game.current.destroyGame();
+			unsubscribeUpdateState();
+			unsubscribeUpdateDistance();
 		};
 	}, []);
+
+	useEffect(() => {
+
+	}, [gameState]);
 
 	return (
 		<div

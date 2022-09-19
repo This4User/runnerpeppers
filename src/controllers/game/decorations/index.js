@@ -79,11 +79,11 @@ class Decorations {
 	}
 
 	moveDecorations() {
-		this.lightsStorage.forEach(decArray => {
+		/*this.lightsStorage.forEach(decArray => {
 			decArray.forEach(dec => {
 				dec.item.y += 2;
 			});
-		});
+		});*/
 	}
 
 	collectLights(edge) {
@@ -99,8 +99,7 @@ class Decorations {
 	}
 
 	get lastDecorationPosition() {
-		const {x, y} = this.lightsStorage[0][0].item;
-
+		const {x, y} = this.lightsStorage[0][this.lightsStorage[0].length - 2].item;
 		return {x, y};
 	}
 }

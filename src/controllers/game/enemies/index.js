@@ -42,11 +42,11 @@ class Enemies {
 		});
 	};
 
-	moveEnemies(hero) {
+	moveEnemies(hero, onHit) {
 		this.holes.forEach((hole) => {
 			hole.item.y += 2;
 			if (hitTest(hero.item, hole.item)) {
-				broadcast(LOOSE);
+				onHit(LOOSE);
 			}
 		});
 	}
