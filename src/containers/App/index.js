@@ -25,10 +25,6 @@ function App() {
 		};
 	}, []);
 
-	useEffect(() => {
-		console.log(`gameState: ${gameState}`);
-	}, [gameState]);
-
 	return (
 		<div
 			className="App"

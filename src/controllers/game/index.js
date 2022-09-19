@@ -3,23 +3,29 @@ import hero from "../../assets/hero.png";
 import wave from "../../assets/wave.png";
 import hole from "../../assets/enemies/enemy_2.png";
 import snowHole from "../../assets/enemies/enemy_1.png";
-import {hitTest} from "../../utils/hitTest";
+import light from "../../assets/decorations/light.png";
 import {LevelGenerator} from "../../utils/levelGenerator";
-import spritesFactory from "./spritesFactory";
 import swipesTracker from "../../utils/swipesTracker";
 import {store} from "../../store";
 import {updateDistance, updateGameState} from "../../store/slices/gameSlice";
 import {
-	IN_GAME, INIT_END,
+	IN_GAME,
+	INIT_END,
 	INIT_ERROR,
 	INIT_START,
 	LOADING_ASSETS,
 	LOADING_ASSETS_END,
-	LOADING_ERROR, LOOSE, PAUSED, PENDING, RESTART, START
+	LOADING_ERROR,
+	LOOSE,
+	PAUSED,
+	PENDING,
+	RESTART,
+	START
 } from "../../store/slices/gameSlice/consts";
 import {broadcast, subscribe} from "../../utils/eventBus";
 import {gameHero} from "./hero";
 import enemies from "./enemies";
+import decorations from "./decorations";
 
 class Game {
 	isPaused = false;
@@ -120,7 +126,8 @@ class Game {
 				.add("wave", wave)
 				.add("hero", hero)
 				.add("hole", hole)
-				.add("snowHole", snowHole);
+				.add("snowHole", snowHole)
+				.add("light", light);
 
 			this.updateGameState(LOADING_ASSETS_END);
 		} catch (error) {
@@ -134,26 +141,16 @@ class Game {
 		this.generator = new LevelGenerator(this.greedSize);
 	}
 
-	initSnow() {
-		const snow = new PIXI.Graphics();
-		snow.beginFill(0xffffff);
-		snow.drawRect(0, 0, 100, this.target.clientHeight);
-
-		return snow;
+	initDecorations(textures) {
+		decorations.connectApp(this.app);
+		decorations.addTextures(textures);
+		decorations.mapDecorations();
 	}
 
-	initDecorations(texture) {
-		const leftSnow = this.initSnow();
-		const rightSnow = this.initSnow();
-		rightSnow.x = this.target.clientWidth - rightSnow.width;
-		this.app.stage.addChild(leftSnow);
-		this.app.stage.addChild(rightSnow);
-
-		const waveSprite = new PIXI.Sprite(texture);
-		waveSprite.position.y = this.app.renderer.height - waveSprite.height;
-		waveSprite.position.x = (this.app.renderer.width / 2) - (waveSprite.width / 2);
-		waveSprite.zIndex = 20;
-		this.app.stage.addChild(waveSprite);
+	updateDecorations() {
+		if (decorations.lastDecorationPosition.y > this.app.renderer.height) {
+			decorations.addLightsLine();
+		}
 	}
 
 	initHero(texture) {
@@ -191,7 +188,10 @@ class Game {
 		this.app.loader
 			.load((loader, resources) => {
 				this.initHero(resources.hero.texture);
-				this.initDecorations(resources.wave.texture);
+				this.initDecorations({
+					wave: resources.wave.texture,
+					light: resources.light.texture
+				});
 				enemies.addTextures({
 					snowHole: resources.snowHole.texture,
 					hole: resources.hole.texture
@@ -203,11 +203,11 @@ class Game {
 						store.dispatch(updateDistance(0.01));
 						gameHero.heroAnimation();
 						enemies.moveEnemies(this.hero);
-						this.updateGreed({
-							snowHole: resources.snowHole.texture,
-							hole: resources.hole.texture
-						});
+						decorations.moveDecorations();
+						this.updateGreed();
+						this.updateDecorations();
 						enemies.collectEnemies(this.app.renderer.height);
+						decorations.collectLights(this.app.renderer.height);
 					}
 				});
 			});

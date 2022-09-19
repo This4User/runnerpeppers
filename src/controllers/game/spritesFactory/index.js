@@ -1,4 +1,4 @@
-import * as PIXI from "pixi.js";
+import {Sprite} from "pixi.js";
 import AbstractFactory from "../../../utils/abstractFactory";
 import {nanoid} from "@reduxjs/toolkit";
 
@@ -22,7 +22,7 @@ class SpritesFactory extends AbstractFactory {
 		} else {
 			return {
 				id: nanoid(),
-				item: new PIXI.Sprite.from(texture),
+				item: new Sprite.from(texture),
 			};
 		}
 	}
@@ -40,7 +40,7 @@ class SpritesFactory extends AbstractFactory {
 
 			return {
 				id: nanoid(),
-				item: new PIXI.Sprite.from(texture)
+				item: new Sprite.from(texture)
 			};
 		}
 	};

@@ -19,11 +19,8 @@ class Enemies {
 	}
 
 	get lastEnemyPosition() {
-		const lastEnemy = this.holes[this.holes.length - 1].item;
-		return {
-			x: lastEnemy.x,
-			y: lastEnemy.y
-		};
+		const {x, y} = this.holes[this.holes.length - 1].item;
+		return {x, y};
 	}
 
 	mapEnemies(greed) {
