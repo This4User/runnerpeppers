@@ -24,6 +24,7 @@ import {broadcast, subscribe} from "../../utils/eventBus";
 import {gameHero} from "./hero";
 import enemies from "./enemies";
 import decorations from "./decorations";
+import {updateGameState} from "../../store/slices/gameSlice";
 
 class Game {
 	isPaused = false;
@@ -49,13 +50,9 @@ class Game {
 
 		subscribe(LOADING_ASSETS_END, () => {
 			try {
-				console.log("awrawrs");
 				this.updateGameState(INIT_START);
-				this.initLevelGenerator();
-				this.initLines();
-				enemies.addLines(this.lines);
-				this.initLoader();
 				this.initInteraction();
+				this.greed = [this.generator.getBrick()];
 				enemies.connectStage(this.app.stage);
 				this.updateGameState(INIT_END);
 			} catch (error) {
@@ -65,14 +62,18 @@ class Game {
 		});
 
 		subscribe(INIT_END, () => {
-			this.greed = [this.generator.getBrick()];
+			enemies.mapEnemies(this.greed);
+			this.initTicker();
 			this.updateGameState(IN_GAME);
 			this.initOnResize();
 		});
 
 		subscribe(RESTART, this.restart);
 
-		this.loadAssets();
+		this.initLevelGenerator();
+		this.initLines();
+		enemies.addLines(this.lines);
+		this.initLoader();
 	}
 
 	restart = () => {
@@ -115,23 +116,6 @@ class Game {
 				this.hero.item.x = this.lines[this.heroLine];
 			}
 		});
-	}
-
-	loadAssets() {
-		this.updateGameState(LOADING_ASSETS);
-		try {
-			this.app.loader
-				.add("wave", wave)
-				.add("hero", hero)
-				.add("hole", hole)
-				.add("snowHole", snowHole)
-				.add("light", light);
-
-			this.updateGameState(LOADING_ASSETS_END);
-		} catch (error) {
-			this.updateGameState(LOADING_ERROR);
-			console.log(error);
-		}
 	}
 
 	initLevelGenerator() {
@@ -182,8 +166,34 @@ class Game {
 		}
 	}
 
+	initTicker() {
+		this.app.ticker.add(() => {
+			if (!this.isPaused) {
+				broadcast("update_distance", 0.01);
+				gameHero.heroAnimation();
+				enemies.moveEnemies(this.hero, this.updateGameState);
+				decorations.moveDecorations();
+				this.updateGreed();
+				this.updateDecorations();
+				enemies.collectEnemies(this.app.renderer.height);
+				decorations.collectLights(this.app.renderer.height);
+			}
+		});
+	}
+
 	initLoader() {
+		this.updateGameState(LOADING_ASSETS);
 		this.app.loader
+			.onError.add((error) => {
+			updateGameState(LOADING_ERROR);
+			console.error(error);
+		});
+		this.app.loader
+			.add("wave", wave)
+			.add("hero", hero)
+			.add("hole", hole)
+			.add("snowHole", snowHole)
+			.add("light", light)
 			.load((loader, resources) => {
 				this.initHero(resources.hero.texture);
 				this.initDecorations({
@@ -194,21 +204,10 @@ class Game {
 					snowHole: resources.snowHole.texture,
 					hole: resources.hole.texture
 				});
-				enemies.mapEnemies(this.greed);
-
-				this.app.ticker.add(() => {
-					if (!this.isPaused) {
-						broadcast("update_distance", 0.01);
-						gameHero.heroAnimation();
-						enemies.moveEnemies(this.hero, this.updateGameState);
-						decorations.moveDecorations();
-						this.updateGreed();
-						this.updateDecorations();
-						enemies.collectEnemies(this.app.renderer.height);
-						decorations.collectLights(this.app.renderer.height);
-					}
-				});
-			});
+			})
+			.onComplete.add(() => {
+			this.updateGameState(LOADING_ASSETS_END);
+		});
 	}
 
 	initOnResize() {

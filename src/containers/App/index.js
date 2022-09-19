@@ -2,7 +2,7 @@ import "./index.css";
 import {useSelector, useDispatch} from "react-redux";
 import {useEffect, useRef} from "react";
 import {broadcast, subscribe} from "../../utils/eventBus";
-import {IN_GAME, PAUSED, PENDING, RESTART, START} from "../../store/slices/gameSlice/consts";
+import {IN_GAME, LOOSE, PAUSED, RESTART, START} from "../../store/slices/gameSlice/consts";
 import {updateDistance, updateGameState} from "../../store/slices/gameSlice";
 
 function App() {
@@ -21,7 +21,6 @@ function App() {
 			});
 
 		const unsubscribeUpdateState = subscribe("update_state", (nextState) => {
-			console.log(nextState);
 			dispatch(updateGameState(nextState));
 			broadcast(nextState);
 		});
@@ -37,10 +36,6 @@ function App() {
 		};
 	}, []);
 
-	useEffect(() => {
-
-	}, [gameState]);
-
 	return (
 		<div
 			className="App"
@@ -50,16 +45,19 @@ function App() {
 				className="game-header"
 			>
 				{distance} м
-				<button onClick={(e) => {
-					e.stopPropagation();
-					if (gameState === IN_GAME) {
-						dispatch(updateGameState(PAUSED));
-						broadcast(PAUSED);
-					} else if (gameState === PAUSED) {
-						dispatch(updateGameState(IN_GAME));
-						broadcast(START);
-					}
-				}}>
+				<button
+					onClick={(e) => {
+						e.stopPropagation();
+						if (gameState === IN_GAME) {
+							dispatch(updateGameState(PAUSED));
+							broadcast(PAUSED);
+						} else if (gameState === PAUSED) {
+							dispatch(updateGameState(IN_GAME));
+							broadcast(START);
+						}
+					}}
+					disabled={gameState === LOOSE}
+				>
 					{
 						gameState === IN_GAME ? "Пауза" : "Продолжить"
 					}
