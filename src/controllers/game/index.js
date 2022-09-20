@@ -96,7 +96,15 @@ class Game {
 			width: targetElement.clientWidth,
 			height: targetElement.clientHeight
 		});
+		const canvas = this.app.renderer.view;
+		const ctx = canvas.getContext("2d");
+		const scale = window.devicePixelRatio;
+
+		canvas.width *= scale;
+		canvas.height *= scale;
+
 		this.app.stage.sortableChildren = true;
+		console.log(ctx);
 
 		targetElement.appendChild(this.app.view);
 	}
