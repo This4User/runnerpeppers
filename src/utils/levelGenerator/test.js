@@ -47,7 +47,7 @@ const getNextBrick = (prevBrick) => {
 
 	return newBrick;
 };
-let prevBrick = [1, 1, 0, 1];
+let prevBrick = [1, 1, 0, 1, 0, 1];
 
 for (let i = 0; i < 10; i++) {
 	console.log(prevBrick);

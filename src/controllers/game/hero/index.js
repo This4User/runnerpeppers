@@ -20,7 +20,7 @@ class Hero {
 			this.isHeroFlipped = false;
 			setTimeout(() => {
 				this.isHeroFlipped = true;
-			}, 500);
+			}, 300);
 		}
 	}
 }
