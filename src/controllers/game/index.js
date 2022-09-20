@@ -160,6 +160,7 @@ class Game {
 	updateGreed() {
 		if (enemies.lastEnemyPosition.y > this.app.renderer.height / 3) {
 			const newBrick = this.generator.getBrick();
+			console.log(newBrick);
 			this.greed.pop();
 			this.greed.push(newBrick);
 			enemies.mapEnemies(this.greed);

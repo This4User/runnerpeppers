@@ -1,6 +1,5 @@
 import spritesFactory from "../spritesFactory";
 import {hitTest} from "../../../utils/hitTest";
-import {broadcast} from "../../../utils/eventBus";
 import {LOOSE} from "../../../store/slices/gameSlice/consts";
 
 class Enemies {
@@ -26,7 +25,7 @@ class Enemies {
 	mapEnemies(greed) {
 		greed.forEach((brick) => {
 			brick.forEach((cell, cellIndex) => {
-				if (cell > 0) {
+				if (cell === 0) {
 					const texture = Math.random() < 0.5 ? this.textures.hole : this.textures.snowHole;
 					const holeSprite = spritesFactory.getEnemy(texture);
 
