@@ -130,9 +130,7 @@ class Game {
 	}
 
 	updateDecorations() {
-		if (decorations.lastDecorationPosition.y > this.app.renderer.height) {
-			decorations.addLightsLine();
-		}
+		decorations.addLightsLine();
 	}
 
 	initHero(texture) {

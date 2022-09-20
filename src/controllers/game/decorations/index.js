@@ -40,7 +40,7 @@ class Decorations {
 				lights[i].item.x += 100 - lights[i].item.width / 4;
 			}
 
-			lights[i].item.y = (lights[i].item.height - lights[i].item.height / 4) * i;
+			lights[i].item.y = (lights[i].item.height - lights[i].item.height / 4) * i - lights[i].item.height * 3 / 4;
 			this.app.stage.addChild(lights[i].item);
 			lights.push(decorationsFactory.getLight(this.textures.light));
 		}
@@ -49,20 +49,23 @@ class Decorations {
 	}
 
 	addLightsLine() {
-		const leftLight = decorationsFactory.getLight(this.textures.light);
-		const rightLight = decorationsFactory.getLight(this.textures.light);
-		leftLight.item.x += 100 - leftLight.item.width / 4;
-		leftLight.item.y = 0;
+		if (this.lastDecorationPosition.y > -this.lightsStorage[0][0].item.height / 2) {
+			const leftLight = decorationsFactory.getLight(this.textures.light);
+			const rightLight = decorationsFactory.getLight(this.textures.light);
+			leftLight.item.x = 100 - leftLight.item.width / 4;
+			leftLight.item.y = -leftLight.item.height * 5 / 4;
 
-		rightLight.item.x += this.app.renderer.width - 100 - rightLight.item.width / 3;
-		rightLight.item.anchor.x = 0.5;
-		rightLight.item.scale.x = -1;
+			rightLight.item.x = this.app.renderer.width - 100 - rightLight.item.width / 3;
+			rightLight.item.anchor.x = 0.5;
+			rightLight.item.scale.x = -1;
+			rightLight.item.y = -rightLight.item.height * 5 / 4;
 
-		this.lightsStorage[0].push(leftLight);
-		this.lightsStorage[1].push(rightLight);
+			this.lightsStorage[0].push(leftLight);
+			this.lightsStorage[1].push(rightLight);
 
-		this.app.stage.addChild(leftLight.item);
-		this.app.stage.addChild(rightLight.item);
+			this.app.stage.addChild(leftLight.item);
+			this.app.stage.addChild(rightLight.item);
+		}
 	}
 
 	mapDecorations() {
@@ -79,17 +82,21 @@ class Decorations {
 	}
 
 	moveDecorations() {
-		/*this.lightsStorage.forEach(decArray => {
+		this.lightsStorage.forEach(decArray => {
 			decArray.forEach(dec => {
 				dec.item.y += 2;
 			});
-		});*/
+		});
 	}
 
 	collectLights(edge) {
 		this.lightsStorage.forEach((lightsArray, index) => {
 			lightsArray.forEach(light => {
-				if (light.item.y > edge + light.item.height) {
+				if (light.item.y > edge) {
+					light.item.y = 0;
+					light.item.x = 0;
+					light.item.anchor.x = 0;
+					light.item.scale.x = 1;
 					decorationsFactory.returnLight(light);
 					this.lightsStorage[index] = lightsArray.filter(({id}) => id !== light.id);
 					this.app.stage.removeChild(light.item);
@@ -99,7 +106,7 @@ class Decorations {
 	}
 
 	get lastDecorationPosition() {
-		const {x, y} = this.lightsStorage[0][this.lightsStorage[0].length - 2].item;
+		const {x, y} = this.lightsStorage[0][this.lightsStorage[0].length - 1].item;
 		return {x, y};
 	}
 }

@@ -23,8 +23,8 @@ class Enemies {
 			return {x, y};
 		} else {
 			return {
-				x: 0,
-				y: 0
+				x: 30000,
+				y: 30000
 			};
 		}
 
