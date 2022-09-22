@@ -1,4 +1,4 @@
-import spritesFactory from "../factories/spritesFactory";
+import spritesFactory, {ENEMY} from "../spritesFactory";
 import {hitTest} from "../../../utils/hitTest";
 import {LOOSE} from "../../../store/slices/gameSlice/consts";
 
@@ -34,7 +34,7 @@ class Enemies {
 			brick.forEach((cell, cellIndex) => {
 				if (cell === 0) {
 					const texture = Math.random() < 0.5 ? this.textures.hole : this.textures.snowHole;
-					const holeSprite = spritesFactory.getEnemy(texture);
+					const holeSprite = spritesFactory.getItem(ENEMY, texture);
 
 					holeSprite.item.anchor.x = 0.5;
 					holeSprite.item.x = this.lines[cellIndex];
@@ -61,7 +61,7 @@ class Enemies {
 		this.holes.forEach(hole => {
 			if (hole.item.y > edge + hole.item.height) {
 
-				spritesFactory.returnEnemy(hole);
+				spritesFactory.returnItem(ENEMY, hole);
 				this.holes = this.holes.filter(({id}) => id !== hole.id);
 				this.stage.removeChild(hole.item);
 			}

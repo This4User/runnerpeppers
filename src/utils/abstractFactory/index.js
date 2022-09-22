@@ -1,7 +1,7 @@
 export default class AbstractFactory {
 	storage = [];
 
-	getItem = (name) => {
+	getItem(name, options) {
 		let items = this.storage.find(item => item.name === name);
 
 		if (items) {
@@ -12,7 +12,7 @@ export default class AbstractFactory {
 
 			return item;
 		} else {
-			return false;
+			return options ? this.createItem(options) : false;
 		}
 	};
 
@@ -29,5 +29,9 @@ export default class AbstractFactory {
 
 			this.storage.push(newItems);
 		}
+	}
+
+	createItem(options) {
+		return {};
 	}
 }

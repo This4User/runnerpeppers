@@ -1,8 +1,8 @@
-import spritesFactory from "../factories/spritesFactory";
+import spritesFactory, {HERO} from "../spritesFactory";
 
 class Hero {
 	getHero(texture) {
-		this.hero = spritesFactory.getHero(texture);
+		this.hero = spritesFactory.getItem(HERO, texture);
 		this.hero.item.interactive = true;
 		this.hero.item.zIndex = 10;
 

@@ -1,5 +1,5 @@
 import {hitTest} from "../../../utils/hitTest";
-import bonusesFactory from "../factories/bonusesFactory";
+import spritesFactory, {BONUS} from "../spritesFactory";
 
 class Bonuses {
 	bonuses = [];
@@ -24,7 +24,7 @@ class Bonuses {
 
 				if (cell === 1 && isBonus) {
 					const texture = this.textures.bonus;
-					const bonusSprite = bonusesFactory.getBonus(texture);
+					const bonusSprite = spritesFactory.getItem(BONUS, texture);
 					this.bonusSize = {
 						width: bonusSprite.width,
 						height: bonusSprite.height
@@ -50,7 +50,7 @@ class Bonuses {
 				setTimeout(() => {
 					bonus.item.width = this.bonusSize.width;
 					bonus.item.height = this.bonusSize.height;
-					bonusesFactory.returnBonus(bonus);
+					spritesFactory.returnItem(BONUS, bonus);
 					this.bonuses = this.bonuses.filter(({id}) => id !== bonus.id);
 					this.stage.removeChild(bonus.item);
 					onTouch();
@@ -62,7 +62,7 @@ class Bonuses {
 	collectBonuses(edge) {
 		this.bonuses.forEach(bonus => {
 			if (bonus.item.y > edge + bonus.item.height) {
-				bonusesFactory.returnBonus(bonus);
+				spritesFactory.returnItem(BONUS, bonus);
 				this.bonuses = this.bonuses.filter(({id}) => id !== bonus.id);
 				this.stage.removeChild(bonus.item);
 			}

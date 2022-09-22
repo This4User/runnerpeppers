@@ -1,5 +1,5 @@
 import * as PIXI from "pixi.js";
-import decorationsFactory from "../factories/decorationsFactory";
+import spritesFactory, {LIGHT} from "../spritesFactory";
 
 class Decorations {
 	lightsStorage = [];
@@ -30,7 +30,7 @@ class Decorations {
 	}
 
 	initLights(isRightSide) {
-		const lights = [decorationsFactory.getLight(this.textures.light)];
+		const lights = [spritesFactory.getItem(LIGHT, this.textures.light)];
 		for (let i = 0; i < this.app.renderer.height / lights[0].item.height; i++) {
 			if (isRightSide) {
 				lights[i].item.x += this.app.renderer.width - 100 - lights[i].item.width / 3;
@@ -42,7 +42,7 @@ class Decorations {
 
 			lights[i].item.y = (lights[i].item.height - lights[i].item.height / 4) * i - lights[i].item.height * 3 / 4;
 			this.app.stage.addChild(lights[i].item);
-			lights.push(decorationsFactory.getLight(this.textures.light));
+			lights.push(spritesFactory.getItem(LIGHT, this.textures.light));
 		}
 
 		return lights;
@@ -50,8 +50,8 @@ class Decorations {
 
 	addLightsLine() {
 		if (this.lastDecorationPosition.y > -this.lightsStorage[0][0].item.height / 2) {
-			const leftLight = decorationsFactory.getLight(this.textures.light);
-			const rightLight = decorationsFactory.getLight(this.textures.light);
+			const leftLight = spritesFactory.getItem(LIGHT, this.textures.light);
+			const rightLight = spritesFactory.getItem(LIGHT, this.textures.light);
 			leftLight.item.x = 100 - leftLight.item.width / 4;
 			leftLight.item.y = -leftLight.item.height * 5 / 4;
 
@@ -97,7 +97,7 @@ class Decorations {
 					light.item.x = 0;
 					light.item.anchor.x = 0;
 					light.item.scale.x = 1;
-					decorationsFactory.returnLight(light);
+					spritesFactory.returnItem(LIGHT, light);
 					this.lightsStorage[index] = lightsArray.filter(({id}) => id !== light.id);
 					this.app.stage.removeChild(light.item);
 				}
