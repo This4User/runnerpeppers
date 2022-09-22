@@ -1,4 +1,4 @@
-import spritesFactory from "../spritesFactory";
+import spritesFactory from "../factories/spritesFactory";
 
 class Hero {
 	getHero(texture) {

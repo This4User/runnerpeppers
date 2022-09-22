@@ -1,4 +1,4 @@
-import spritesFactory from "../spritesFactory";
+import spritesFactory from "../factories/spritesFactory";
 import {hitTest} from "../../../utils/hitTest";
 import {LOOSE} from "../../../store/slices/gameSlice/consts";
 
@@ -27,7 +27,6 @@ class Enemies {
 				y: 30000
 			};
 		}
-
 	}
 
 	mapEnemies(greed) {

@@ -4,6 +4,7 @@ import wave from "../../assets/wave.png";
 import hole from "../../assets/enemies/enemy_2.png";
 import snowHole from "../../assets/enemies/enemy_1.png";
 import light from "../../assets/decorations/light.png";
+import bonus from "../../assets/bonus.png";
 import {LevelGenerator} from "../../utils/levelGenerator";
 import swipesTracker from "../../utils/swipesTracker";
 import {
@@ -25,6 +26,7 @@ import {gameHero} from "./hero";
 import enemies from "./enemies";
 import decorations from "./decorations";
 import {updateGameState} from "../../store/slices/gameSlice";
+import bonuses from "./bonuses";
 
 class Game {
 	isPaused = false;
@@ -54,6 +56,7 @@ class Game {
 				this.initInteraction();
 				this.greed = [this.generator.getBrick()];
 				enemies.connectStage(this.app.stage);
+				bonuses.connectStage(this.app.stage);
 				this.updateGameState(INIT_END);
 			} catch (error) {
 				this.updateGameState(INIT_ERROR);
@@ -73,11 +76,13 @@ class Game {
 		this.initLevelGenerator();
 		this.initLines();
 		enemies.addLines(this.lines);
+		bonuses.addLines(this.lines);
 		this.initLoader();
 	}
 
 	restart = () => {
 		enemies.reset();
+		bonuses.reset();
 		this.greed = [this.generator.getBrick()];
 		enemies.mapEnemies(this.greed);
 		broadcast("update_distance", 0);
@@ -97,14 +102,12 @@ class Game {
 			height: targetElement.clientHeight
 		});
 		const canvas = this.app.renderer.view;
-		const ctx = canvas.getContext("2d");
 		const scale = window.devicePixelRatio;
 
 		canvas.width *= scale;
 		canvas.height *= scale;
 
 		this.app.stage.sortableChildren = true;
-		console.log(ctx);
 
 		targetElement.appendChild(this.app.view);
 	}
@@ -169,6 +172,7 @@ class Game {
 			this.greed.pop();
 			this.greed.push(newBrick);
 			enemies.mapEnemies(this.greed);
+			bonuses.mapBonuses(this.greed);
 		}
 	}
 
@@ -178,10 +182,14 @@ class Game {
 				broadcast("update_distance", 0.01);
 				gameHero.heroAnimation();
 				enemies.moveEnemies(this.hero, this.updateGameState);
+				bonuses.moveBonuses(this.hero, () => {
+					broadcast("update_distance", 50);
+				});
 				decorations.moveDecorations();
 				this.updateGreed();
 				this.updateDecorations();
 				enemies.collectEnemies(this.app.renderer.height);
+				bonuses.collectBonuses(this.app.renderer.height);
 				decorations.collectLights(this.app.renderer.height);
 			}
 		});
@@ -200,6 +208,7 @@ class Game {
 			.add("hole", hole)
 			.add("snowHole", snowHole)
 			.add("light", light)
+			.add("bonus", bonus)
 			.load((loader, resources) => {
 				this.initHero(resources.hero.texture);
 				this.initDecorations({
@@ -209,6 +218,10 @@ class Game {
 				enemies.addTextures({
 					snowHole: resources.snowHole.texture,
 					hole: resources.hole.texture
+				});
+
+				bonuses.addTextures({
+					bonus: resources.bonus.texture
 				});
 			})
 			.onComplete.add(() => {

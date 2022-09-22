@@ -1,5 +1,5 @@
 import * as PIXI from "pixi.js";
-import decorationsFactory from "../decorationsFactory";
+import decorationsFactory from "../factories/decorationsFactory";
 
 class Decorations {
 	lightsStorage = [];
