@@ -3,13 +3,15 @@ import {useSelector, useDispatch} from "react-redux";
 import {useEffect, useRef} from "react";
 import {broadcast, subscribe} from "../../utils/eventBus";
 import {IN_GAME, LOOSE, PAUSED, RESTART, START, UPDATE_DIFFICULT} from "../../store/slices/gameSlice/consts";
-import {updateDistance, updateGameState} from "../../store/slices/gameSlice";
+import {updateDistance, updateGameState, updateLife} from "../../store/slices/gameSlice";
+import headerBackground from "../../assets/header-bg.svg";
 
 function App() {
 	const root = useRef(null);
 	const game = useRef(null);
 	const dispatch = useDispatch();
 	const gameState = useSelector((state) => state.game.current);
+	const life = useSelector((state) => state.game.life);
 	const distance = useSelector((state) => Math.floor(state.game.distance));
 
 	useEffect(() => {
@@ -29,10 +31,15 @@ function App() {
 			dispatch(updateDistance(length));
 		});
 
+		const unsubscribeUpdateLife = subscribe("update_life", (options) => {
+			dispatch(updateLife(options));
+		});
+
 		return () => {
 			if (game) game.current.destroyGame();
 			unsubscribeUpdateState();
 			unsubscribeUpdateDistance();
+			unsubscribeUpdateLife();
 		};
 	}, []);
 
@@ -42,6 +49,12 @@ function App() {
 		}
 	}, [distance]);
 
+	useEffect(() => {
+		if (life < 0) {
+			broadcast("update_state", LOOSE);
+		}
+	}, [life]);
+
 	return (
 		<div
 			className="App"
@@ -50,34 +63,53 @@ function App() {
 			<div
 				className="game-header"
 			>
-				{distance} м
-				<button
-					onClick={(e) => {
-						e.stopPropagation();
-						if (gameState === IN_GAME) {
-							dispatch(updateGameState(PAUSED));
-							broadcast(PAUSED);
-						} else if (gameState === PAUSED) {
-							dispatch(updateGameState(IN_GAME));
-							broadcast(START);
+				<div className="actions">
+					<button
+						onClick={(e) => {
+							e.stopPropagation();
+							if (gameState === IN_GAME) {
+								dispatch(updateGameState(PAUSED));
+								broadcast(PAUSED);
+							} else if (gameState === PAUSED) {
+								dispatch(updateGameState(IN_GAME));
+								broadcast(START);
+							}
+						}}
+						disabled={gameState === LOOSE}
+					>
+						{
+							gameState === IN_GAME ? "Пауза" : "Продолжить"
 						}
-					}}
-					disabled={gameState === LOOSE}
-				>
-					{
-						gameState === IN_GAME ? "Пауза" : "Продолжить"
-					}
-				</button>
-				<button
-					onClick={() => {
-						if (gameState !== IN_GAME) {
-							broadcast(RESTART);
-						}
-					}}
-					disabled={gameState === IN_GAME}
-				>
-					Занаво
-				</button>
+					</button>
+					<button
+						onClick={() => {
+							if (gameState !== IN_GAME) {
+								broadcast(RESTART);
+							}
+						}}
+						disabled={gameState === IN_GAME}
+					>
+						Занаво
+					</button>
+				</div>
+				<div className="info">
+					<div className="info__number">
+						{distance}
+					</div>
+					<div className="info__text">
+						метры
+					</div>
+				</div>
+				<div className="info">
+					<div className="info__number">
+						{life !== -1 ? life : 0}
+					</div>
+					<div className="info__text">
+						жизни
+					</div>
+				</div>
+
+				<img src={headerBackground} alt="header background"/>
 			</div>
 		</div>
 	);

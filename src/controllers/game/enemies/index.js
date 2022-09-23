@@ -1,9 +1,9 @@
 import spritesFactory, {ENEMY} from "../spritesFactory";
 import {hitTest} from "../../../utils/hitTest";
-import {LOOSE} from "../../../store/slices/gameSlice/consts";
 
 class Enemies {
 	holes = [];
+	lastHittedHoleID;
 
 	connectStage(stage) {
 		this.stage = stage;
@@ -52,7 +52,10 @@ class Enemies {
 		this.holes.forEach((hole) => {
 			hole.item.y += speed || 2;
 			if (hitTest(hero.item, hole.item)) {
-				onHit(LOOSE);
+				if (!this.lastHittedHoleID || this.lastHittedHoleID !== hole.id) {
+					this.lastHittedHoleID = hole.id;
+					onHit();
+				}
 			}
 		});
 	}

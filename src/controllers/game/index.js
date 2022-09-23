@@ -93,6 +93,7 @@ class Game {
 		this.greed = [this.generator.getBrick()];
 		enemies.mapEnemies(this.greed);
 		broadcast("update_distance", 0);
+		broadcast("update_life", RESTART);
 		this.isPaused = false;
 		this.updateGameState(IN_GAME);
 	};
@@ -183,12 +184,17 @@ class Game {
 		}
 	}
 
+	onEnemyHit() {
+		broadcast("update_life");
+		gameHero.onHit();
+	}
+
 	initTicker() {
 		this.app.ticker.add(() => {
 			if (!this.isPaused) {
 				broadcast("update_distance", this.speed / 50);
 				gameHero.heroAnimation();
-				enemies.moveEnemies(this.speed, this.hero, this.updateGameState);
+				enemies.moveEnemies(this.speed, this.hero, this.onEnemyHit);
 				bonuses.moveBonuses(this.speed, this.hero, () => {
 					broadcast("update_distance", 50);
 				});

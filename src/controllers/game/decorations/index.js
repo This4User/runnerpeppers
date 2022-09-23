@@ -41,6 +41,7 @@ class Decorations {
 			}
 
 			lights[i].item.y = (lights[i].item.height - lights[i].item.height / 4) * i - lights[i].item.height * 3 / 4;
+			lights[i].item.zIndex = 10;
 			this.app.stage.addChild(lights[i].item);
 			lights.push(spritesFactory.getItem(LIGHT, this.textures.light));
 		}
@@ -53,12 +54,14 @@ class Decorations {
 			const leftLight = spritesFactory.getItem(LIGHT, this.textures.light);
 			leftLight.item.x = 100 - leftLight.item.width / 4;
 			leftLight.item.y = -leftLight.item.height * 5 / 4;
+			leftLight.item.zIndex = 10;
 
 			const rightLight = spritesFactory.getItem(LIGHT, this.textures.light);
 			rightLight.item.x = this.app.renderer.width - 100 - rightLight.item.width / 3;
 			rightLight.item.anchor.x = 0.5;
 			rightLight.item.scale.x = -1;
 			rightLight.item.y = -rightLight.item.height * 5 / 4;
+			leftLight.item.zIndex = 10;
 
 			this.lightsStorage[0].push(leftLight);
 			this.lightsStorage[1].push(rightLight);

@@ -23,6 +23,24 @@ class Hero {
 			}, 300);
 		}
 	}
+
+	onHit() {
+		let isVisible = true;
+
+		const stepInterval = setInterval(() => {
+			isVisible ? this.hero.item.alpha -= 0.1 : this.hero.item.alpha += 0.1;
+		}, 25);
+
+		const cycleInterval = setInterval(() => {
+			isVisible = !isVisible;
+		}, 300);
+
+		setTimeout(() => {
+			clearInterval(stepInterval);
+			clearInterval(cycleInterval);
+			this.hero.item.alpha = 1;
+		}, 900);
+	}
 }
 
 export const gameHero = new Hero();

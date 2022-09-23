@@ -1,12 +1,13 @@
 import {createSlice} from "@reduxjs/toolkit";
 import {
-	PENDING
+	PENDING, RESTART
 } from "./consts";
 import {stateConfig} from "./stateConfig";
 
 const initialState = {
 	current: PENDING,
-	distance: 0
+	distance: 0,
+	life: 3
 };
 
 export const gameStateSlice = createSlice({
@@ -33,11 +34,19 @@ export const gameStateSlice = createSlice({
 			} else {
 				state.distance = 0;
 			}
+		},
+
+		updateLife: (state, action) => {
+			if (action.payload !== RESTART) {
+				state.life -= 1;
+			} else {
+				state.life = 3;
+			}
 		}
 	},
 });
 
-export const {updateDistance} = gameStateSlice.actions;
+export const {updateDistance, updateLife} = gameStateSlice.actions;
 
 export const updateGameState = (newState) => (dispatch) => {
 	dispatch(gameStateSlice.actions.updateState(newState));
