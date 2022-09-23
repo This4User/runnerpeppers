@@ -19,7 +19,7 @@ import {
 	PAUSED,
 	PENDING,
 	RESTART,
-	START
+	START, UPDATE_DIFFICULT
 } from "../../store/slices/gameSlice/consts";
 import {broadcast, subscribe} from "../../utils/eventBus";
 import {gameHero} from "./hero";
@@ -30,6 +30,7 @@ import bonuses from "./bonuses";
 
 class Game {
 	isPaused = false;
+	speed = 2;
 
 	addTarget(targetElement) {
 		this.target = targetElement;
@@ -64,6 +65,11 @@ class Game {
 			}
 		});
 
+		subscribe(UPDATE_DIFFICULT, (delta) => {
+			if (this.speed < 12) this.speed += delta
+			;
+		});
+
 		subscribe(INIT_END, () => {
 			enemies.mapEnemies(this.greed);
 			this.initTicker();
@@ -81,6 +87,7 @@ class Game {
 	}
 
 	restart = () => {
+		this.speed = 1.5;
 		enemies.reset();
 		bonuses.reset();
 		this.greed = [this.generator.getBrick()];
@@ -179,13 +186,13 @@ class Game {
 	initTicker() {
 		this.app.ticker.add(() => {
 			if (!this.isPaused) {
-				broadcast("update_distance", 0.01);
+				broadcast("update_distance", this.speed / 50);
 				gameHero.heroAnimation();
-				enemies.moveEnemies(this.hero, this.updateGameState);
-				bonuses.moveBonuses(this.hero, () => {
+				enemies.moveEnemies(this.speed, this.hero, this.updateGameState);
+				bonuses.moveBonuses(this.speed, this.hero, () => {
 					broadcast("update_distance", 50);
 				});
-				decorations.moveDecorations();
+				decorations.moveDecorations(this.speed);
 				this.updateGreed();
 				this.updateDecorations();
 				enemies.collectEnemies(this.app.renderer.height);

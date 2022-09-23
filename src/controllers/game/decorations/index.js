@@ -81,10 +81,10 @@ class Decorations {
 		);
 	}
 
-	moveDecorations() {
+	moveDecorations(speed) {
 		this.lightsStorage.forEach(decArray => {
 			decArray.forEach(dec => {
-				dec.item.y += 2;
+				dec.item.y += speed || 2;
 			});
 		});
 	}

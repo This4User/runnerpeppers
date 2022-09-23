@@ -12,3 +12,4 @@ export const WIN = "win";
 export const END = "end";
 export const START = "start";
 export const RESTART = "restart";
+export const UPDATE_DIFFICULT = "update_difficult";

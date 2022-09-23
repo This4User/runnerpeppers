@@ -10,9 +10,13 @@ export default class AbstractFactory {
 			items.array = items.array.filter(currentItem => currentItem.id !== item.id);
 			this.storage.push(items);
 
-			return item;
+			if (item) {
+				return item;
+			} else {
+				return this.createItem(options);
+			}
 		} else {
-			return options ? this.createItem(options) : false;
+			return this.createItem(options);
 		}
 	};
 

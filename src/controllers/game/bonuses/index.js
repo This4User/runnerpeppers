@@ -41,9 +41,9 @@ class Bonuses {
 		});
 	};
 
-	moveBonuses(hero, onTouch) {
+	moveBonuses(speed, hero, onTouch) {
 		this.bonuses.forEach((bonus) => {
-			bonus.item.y += 2;
+			bonus.item.y += speed || 2;
 			if (hitTest(hero.item, bonus.item)) {
 				bonus.item.width *= 0.5;
 				bonus.item.height *= 0.5;

@@ -2,7 +2,7 @@ import "./index.css";
 import {useSelector, useDispatch} from "react-redux";
 import {useEffect, useRef} from "react";
 import {broadcast, subscribe} from "../../utils/eventBus";
-import {IN_GAME, LOOSE, PAUSED, RESTART, START} from "../../store/slices/gameSlice/consts";
+import {IN_GAME, LOOSE, PAUSED, RESTART, START, UPDATE_DIFFICULT} from "../../store/slices/gameSlice/consts";
 import {updateDistance, updateGameState} from "../../store/slices/gameSlice";
 
 function App() {
@@ -35,6 +35,12 @@ function App() {
 			unsubscribeUpdateDistance();
 		};
 	}, []);
+
+	useEffect(() => {
+		if (distance % 100 === 1) {
+			broadcast(UPDATE_DIFFICULT, 0.5);
+		}
+	}, [distance]);
 
 	return (
 		<div

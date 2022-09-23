@@ -48,9 +48,9 @@ class Enemies {
 		});
 	};
 
-	moveEnemies(hero, onHit) {
+	moveEnemies(speed, hero, onHit) {
 		this.holes.forEach((hole) => {
-			hole.item.y += 2;
+			hole.item.y += speed || 2;
 			if (hitTest(hero.item, hole.item)) {
 				onHit(LOOSE);
 			}
