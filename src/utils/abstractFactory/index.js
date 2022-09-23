@@ -4,11 +4,9 @@ export default class AbstractFactory {
 	getItem(name, options) {
 		let items = this.storage.find(item => item.name === name);
 
-		if (items) {
-			this.storage = this.storage.filter(item => item.name !== name);
-			const item = items.array[Math.floor(Math.random() * items.array.length)];
-			items.array = items.array.filter(currentItem => currentItem.id !== item.id);
-			this.storage.push(items);
+		if (items && items.array.length) {
+			const item = items.array[items.array.length - 1];
+			items.array.pop();
 
 			if (item) {
 				return item;

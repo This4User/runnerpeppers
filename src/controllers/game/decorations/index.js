@@ -51,10 +51,10 @@ class Decorations {
 	addLightsLine() {
 		if (this.lastDecorationPosition.y > -this.lightsStorage[0][0].item.height / 2) {
 			const leftLight = spritesFactory.getItem(LIGHT, this.textures.light);
-			const rightLight = spritesFactory.getItem(LIGHT, this.textures.light);
 			leftLight.item.x = 100 - leftLight.item.width / 4;
 			leftLight.item.y = -leftLight.item.height * 5 / 4;
 
+			const rightLight = spritesFactory.getItem(LIGHT, this.textures.light);
 			rightLight.item.x = this.app.renderer.width - 100 - rightLight.item.width / 3;
 			rightLight.item.anchor.x = 0.5;
 			rightLight.item.scale.x = -1;
@@ -92,14 +92,14 @@ class Decorations {
 	collectLights(edge) {
 		this.lightsStorage.forEach((lightsArray, index) => {
 			lightsArray.forEach(light => {
-				if (light.item.y > edge) {
+				if (light.item.y > edge + light.item.height / 2) {
+					this.app.stage.removeChild(light.item);
+					this.lightsStorage[index] = lightsArray.filter(({id}) => id !== light.id);
+					spritesFactory.returnItem(LIGHT, light);
 					light.item.y = 0;
 					light.item.x = 0;
 					light.item.anchor.x = 0;
 					light.item.scale.x = 1;
-					spritesFactory.returnItem(LIGHT, light);
-					this.lightsStorage[index] = lightsArray.filter(({id}) => id !== light.id);
-					this.app.stage.removeChild(light.item);
 				}
 			});
 		});
