@@ -1,8 +1,11 @@
 import * as PIXI from "pixi.js";
-import spritesFactory, {LIGHT} from "../spritesFactory";
+import spritesFactory, {CAR, LIGHT} from "../spritesFactory";
 
 class Decorations {
 	lightsStorage = [];
+	treesStorage = [];
+	benchesStorage = [];
+	carsStorage = [];
 
 	connectApp(app) {
 		this.app = app;
@@ -29,27 +32,38 @@ class Decorations {
 		return waveSprite;
 	}
 
-	initLights(isRightSide) {
+	initDecorations(isRightSide) {
 		const lights = [spritesFactory.getItem(LIGHT, this.textures.light)];
+		const cars = [spritesFactory.getItem(CAR, this.textures.car)];
 		for (let i = 0; i < this.app.renderer.height / lights[0].item.height; i++) {
 			if (isRightSide) {
 				lights[i].item.x += this.app.renderer.width - 100 - lights[i].item.width / 3;
 				lights[i].item.anchor.x = 0.5;
 				lights[i].item.scale.x = -1;
+				cars[i].item.x += this.app.renderer.width - 100;
 			} else {
 				lights[i].item.x += 100 - lights[i].item.width / 4;
+				cars[i].item.x += 100 - lights[i].item.width;
 			}
 
+			cars[i].item.y = cars[i].item.height * 4 * i;
+			cars[i].item.zIndex = 10;
 			lights[i].item.y = (lights[i].item.height - lights[i].item.height / 4) * i - lights[i].item.height * 3 / 4;
 			lights[i].item.zIndex = 10;
 			this.app.stage.addChild(lights[i].item);
+			this.app.stage.addChild(cars[i].item);
+			console.log(cars[i]);
+			cars.push(spritesFactory.getItem(CAR, this.textures.car));
 			lights.push(spritesFactory.getItem(LIGHT, this.textures.light));
 		}
 
-		return lights;
+		return {
+			lights,
+			cars
+		};
 	}
 
-	addLightsLine() {
+	addDecorationsLine() {
 		if (this.lastDecorationPosition.y > -this.lightsStorage[0][0].item.height / 2) {
 			const leftLight = spritesFactory.getItem(LIGHT, this.textures.light);
 			leftLight.item.x = 100 - leftLight.item.width / 4;
@@ -74,13 +88,19 @@ class Decorations {
 	mapDecorations() {
 		const leftSnow = this.initSnow();
 		const rightSnow = this.initSnow();
+		const leftDecorations = this.initDecorations();
+		const rightDecorations = this.initDecorations(true);
 		rightSnow.x = this.app.renderer.width - rightSnow.width;
 		this.app.stage.addChild(leftSnow);
 		this.app.stage.addChild(rightSnow);
 		this.app.stage.addChild(this.initWave());
 		this.lightsStorage.push(
-			this.initLights(),
-			this.initLights(true)
+			leftDecorations.lights,
+			rightDecorations.lights
+		);
+		this.carsStorage.push(
+			leftDecorations.cars,
+			rightDecorations.cars
 		);
 	}
 
@@ -90,6 +110,16 @@ class Decorations {
 				dec.item.y += speed || 2;
 			});
 		});
+		this.carsStorage.forEach(decArray => {
+			decArray.forEach(dec => {
+				dec.item.y += speed || 2;
+			});
+		});
+	}
+
+	collectDecorations(edge) {
+		this.collectLights(edge);
+		this.collectCars(edge);
 	}
 
 	collectLights(edge) {
@@ -103,6 +133,22 @@ class Decorations {
 					light.item.x = 0;
 					light.item.anchor.x = 0;
 					light.item.scale.x = 1;
+				}
+			});
+		});
+	}
+
+	collectCars(edge) {
+		this.carsStorage.forEach((carsArray, index) => {
+			carsArray.forEach(car => {
+				if (car.item.y > edge + car.item.height / 2) {
+					this.app.stage.removeChild(car.item);
+					this.carsStorage[index] = carsArray.filter(({id}) => id !== car.id);
+					spritesFactory.returnItem(CAR, car);
+					car.item.y = 0;
+					car.item.x = 0;
+					car.item.anchor.x = 0;
+					car.item.scale.x = 1;
 				}
 			});
 		});

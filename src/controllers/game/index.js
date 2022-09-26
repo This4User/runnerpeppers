@@ -5,6 +5,9 @@ import hole from "../../assets/enemies/enemy_2.png";
 import snowHole from "../../assets/enemies/enemy_1.png";
 import light from "../../assets/decorations/light.png";
 import bonus from "../../assets/bonus.png";
+import car from "../../assets/decorations/car.png";
+import bench from "../../assets/decorations/bench.png";
+import tree from "../../assets/decorations/tree.png";
 import {LevelGenerator} from "../../utils/levelGenerator";
 import swipesTracker from "../../utils/swipesTracker";
 import {
@@ -149,7 +152,7 @@ class Game {
 	}
 
 	updateDecorations() {
-		decorations.addLightsLine();
+		decorations.addDecorationsLine();
 	}
 
 	initHero(texture) {
@@ -222,11 +225,17 @@ class Game {
 			.add("snowHole", snowHole)
 			.add("light", light)
 			.add("bonus", bonus)
+			.add("car", car)
+			.add("bench", bench)
+			.add("tree", tree)
 			.load((loader, resources) => {
 				this.initHero(resources.hero.texture);
 				this.initDecorations({
 					wave: resources.wave.texture,
-					light: resources.light.texture
+					light: resources.light.texture,
+					car: resources.car.texture,
+					tree: resources.tree.texture,
+					bench: resources.bench.texture
 				});
 				enemies.addTextures({
 					snowHole: resources.snowHole.texture,
