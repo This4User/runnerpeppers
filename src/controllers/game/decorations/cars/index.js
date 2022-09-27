@@ -1,4 +1,4 @@
-import AbstractDecoration from "../absctractDecoration";
+import AbstractDecoration from "../abstractDecoration";
 import spritesFactory, {CAR} from "../../spritesFactory";
 
 class Cars extends AbstractDecoration {

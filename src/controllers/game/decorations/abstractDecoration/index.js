@@ -1,4 +1,4 @@
-import spritesFactory from "../spritesFactory";
+import spritesFactory from "../../spritesFactory";
 
 class AbstractDecorations {
 	decorationsStorage = [];

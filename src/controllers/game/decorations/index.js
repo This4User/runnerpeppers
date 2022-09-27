@@ -3,6 +3,7 @@ import Lights from "./lights";
 import Cars from "./cars";
 
 class Decorations {
+	storage = [];
 
 	connectApp(app) {
 		this.app = app;
@@ -34,8 +35,8 @@ class Decorations {
 		const stageHeight = this.app.renderer.height;
 		const stageWidth = this.app.renderer.width;
 
-		this.lights = new Lights(this.textures.light, stage, stageHeight, stageWidth);
-		this.cars = new Cars(this.textures.car, stage, stageHeight, stageWidth);
+		this.storage.push(new Lights(this.textures.light, stage, stageHeight, stageWidth));
+		this.storage.push(new Cars(this.textures.car, stage, stageHeight, stageWidth));
 
 		const leftSnow = this.initSnow();
 		const rightSnow = this.initSnow();
@@ -44,25 +45,29 @@ class Decorations {
 		this.app.stage.addChild(rightSnow);
 		this.app.stage.addChild(this.initWave());
 
-		this.lights.initDecorations();
-		this.lights.initDecorations(true);
-		this.cars.initDecorations();
-		this.cars.initDecorations(true);
+
+		this.storage.forEach(dec => {
+			dec.initDecorations();
+			dec.initDecorations(true);
+		});
 	}
 
 	addDecorationsLine() {
-		this.lights.addDecorationsLine();
-		this.cars.addDecorationsLine();
+		this.storage.forEach(dec => {
+			dec.addDecorationsLine();
+		});
 	}
 
 	moveDecorations(speed) {
-		this.lights.moveDecorations(speed);
-		this.cars.moveDecorations(speed);
+		this.storage.forEach(dec => {
+			dec.moveDecorations(speed);
+		});
 	}
 
 	collectDecorations(edge) {
-		this.lights.collectDecorations(edge);
-		this.cars.collectDecorations(edge);
+		this.storage.forEach(dec => {
+			dec.collectDecorations(edge);
+		});
 	}
 }
 
