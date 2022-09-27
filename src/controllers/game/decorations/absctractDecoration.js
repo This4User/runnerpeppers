@@ -2,27 +2,17 @@ import spritesFactory from "../spritesFactory";
 
 class AbstractDecorations {
 	decorationsStorage = [];
+	name;
 
-	constructor(name, textures, gap, leftAxis, rightAxis, sceneHeight, sceneWidth) {
-		this.name = name;
+	constructor(textures, stage, sceneHeight, sceneWidth) {
 		this.textures = textures;
-		this.gap = gap;
-		this.leftAxis = leftAxis;
-		this.rightAxis = rightAxis;
+		this.stage = stage;
 		this.sceneHeight = sceneHeight;
 		this.sceneWidth = sceneWidth;
 	}
 
 	initDecorations(isRightSide) {
-		const decorations = [spritesFactory.getItem(this.name, this.textures)];
 
-		for (let i = 0; i < this.sceneHeight / decorations[0].item.height; i++) {
-			if (isRightSide) {
-
-			} else {
-
-			}
-		}
 	}
 
 	addDecorationsLine() {
@@ -41,24 +31,23 @@ class AbstractDecorations {
 		this.decorationsStorage.forEach((decArray, index) => {
 			decArray.forEach(dec => {
 				if (dec.item.y > edge + dec.item.height / 2) {
-					this.onItemCollect(this.name, dec.item);
+					this.decorationsStorage[index] = decArray.filter(({id}) => id !== dec.id);
 					this.restoreDecoration(dec.item);
+					this.stage.removeChild(dec.item);
+					spritesFactory.returnItem(this.name, dec);
 				}
 			});
 		});
-	}
-
-	onItemCollect(name, item) {
-
 	}
 
 	restoreDecoration(item) {
 
 	}
 
-	getLastDecorationPosition() {
+	get lastDecorationPosition() {
 		const {x, y} = this.decorationsStorage[0][this.decorationsStorage[0].length - 1].item;
-
 		return {x, y};
 	}
 }
+
+export default AbstractDecorations;

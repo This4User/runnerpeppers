@@ -148,7 +148,7 @@ class Game {
 	initDecorations(textures) {
 		decorations.connectApp(this.app);
 		decorations.addTextures(textures);
-		decorations.mapDecorations();
+		decorations.initDecorations();
 	}
 
 	updateDecorations() {
@@ -206,7 +206,7 @@ class Game {
 				this.updateDecorations();
 				enemies.collectEnemies(this.app.renderer.height);
 				bonuses.collectBonuses(this.app.renderer.height);
-				decorations.collectLights(this.app.renderer.height);
+				decorations.collectDecorations(this.app.renderer.height);
 			}
 		});
 	}
