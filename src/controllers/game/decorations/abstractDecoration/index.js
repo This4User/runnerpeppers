@@ -11,8 +11,11 @@ class AbstractDecorations {
 		this.sceneWidth = sceneWidth;
 	}
 
-	initDecorations(isRightSide) {
-
+	initDecorations() {
+		this.decorationsStorage.push(
+			[spritesFactory.getItem(this.name, this.textures)],
+			[spritesFactory.getItem(this.name, this.textures)]
+		);
 	}
 
 	addDecorationsLine() {
@@ -41,7 +44,10 @@ class AbstractDecorations {
 	}
 
 	restoreDecoration(item) {
-
+		item.y = 0;
+		item.x = 0;
+		item.anchor.x = 0;
+		item.scale.x = 1;
 	}
 
 	get lastDecorationPosition() {

@@ -1,6 +1,8 @@
 import * as PIXI from "pixi.js";
 import Lights from "./lights";
 import Cars from "./cars";
+import Benches from "./benches";
+import Trees from "./trees";
 
 class Decorations {
 	storage = [];
@@ -37,6 +39,8 @@ class Decorations {
 
 		this.storage.push(new Lights(this.textures.light, stage, stageHeight, stageWidth));
 		this.storage.push(new Cars(this.textures.car, stage, stageHeight, stageWidth));
+		this.storage.push(new Benches(this.textures.bench, stage, stageHeight, stageWidth));
+		this.storage.push(new Trees(this.textures.tree, stage, stageHeight, stageWidth))
 
 		const leftSnow = this.initSnow();
 		const rightSnow = this.initSnow();
@@ -48,7 +52,6 @@ class Decorations {
 
 		this.storage.forEach(dec => {
 			dec.initDecorations();
-			dec.initDecorations(true);
 		});
 	}
 
