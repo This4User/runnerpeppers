@@ -10,12 +10,18 @@ const getRandomNumber = (min = 0, max = 10) => {
 
 
 const generationConfig = {
-	"100": [[1, 1, 0]],
+	"100": [
+		[1, 1, 0],
+		[1, 0, 0]
+	],
 	"010": [
 		[1, 1, 0],
 		[0, 1, 1]
 	],
-	"001": [[0, 1, 1]],
+	"001": [
+		[0, 1, 1],
+		[0, 0, 1]
+	],
 	"110": [
 		[0, 1, 1],
 		[1, 0, 0],
@@ -30,13 +36,14 @@ const generationConfig = {
 	]
 };
 
+let prevIndex = 0;
+
 const getNextBrick = (prevBrick) => {
 	const newBrick = [];
 	let availableCells = prevBrick.length;
 	let pathNumber = 1;
-	const targetBunchIndex = prevBrick.length > 3 ? getRandomNumber(0, prevBrick.length - 2) : 0;
+	const targetBunchIndex = prevIndex;
 	const isTargetBunchExist = prevBrick.slice(targetBunchIndex, targetBunchIndex + 3).indexOf(1) !== -1;
-
 	const getBunch = (bunchIndex) => {
 		return prevBrick.slice(bunchIndex, bunchIndex + 3).join("");
 	};
@@ -52,6 +59,13 @@ const getNextBrick = (prevBrick) => {
 			newBrick.push(...randomBunch);
 			availableCells -= 3;
 			pathNumber -= 1;
+			if ((prevIndex + 3 < prevBrick.length)) {
+				prevIndex++;
+			} else {
+				if (randomBunch.join("") !== "011" && randomBunch.join("") !== "110") {
+					prevIndex--;
+				}
+			}
 		} else if (availableCells >= 1) {
 			newBrick.push(0);
 			availableCells -= 1;
