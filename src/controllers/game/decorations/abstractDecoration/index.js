@@ -18,7 +18,7 @@ class AbstractDecorations {
 		);
 	}
 
-	addDecorationsLine() {
+	addDecorations() {
 
 	}
 

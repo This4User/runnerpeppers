@@ -9,6 +9,7 @@ export const LIGHT = "light";
 export const CAR = "car";
 export const BENCH = "bench";
 export const TREE = "tree";
+export const WAVE = "wave";
 
 class SpritesFactory extends AbstractFactory {
 	createItem(options) {

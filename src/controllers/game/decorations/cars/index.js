@@ -6,7 +6,7 @@ import {ADD_BENCH} from "../benches";
 class Cars extends AbstractDecoration {
 	name = CAR;
 
-	addDecorationsLine() {
+	addDecorations() {
 		if (this.lastDecorationPosition.y > -this.decorationsStorage[0][0].item.height / 2) {
 			const leftCar = spritesFactory.getItem(this.name, this.textures);
 			leftCar.item.x = 100 - 54;

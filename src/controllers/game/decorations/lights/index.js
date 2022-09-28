@@ -4,7 +4,7 @@ import spritesFactory, {LIGHT} from "../../spritesFactory";
 class Lights extends AbstractDecorations {
 	name = LIGHT;
 
-	addDecorationsLine() {
+	addDecorations() {
 		if (this.lastDecorationPosition.y > -this.decorationsStorage[0][0].item.height / 2) {
 			const leftLight = spritesFactory.getItem(this.name, this.textures);
 			leftLight.item.x = 100 - leftLight.item.width / 4;
