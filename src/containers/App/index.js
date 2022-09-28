@@ -1,6 +1,6 @@
 import "./index.css";
 import {useSelector, useDispatch} from "react-redux";
-import {useEffect, useRef} from "react";
+import {useEffect, useRef, useState} from "react";
 import {broadcast, subscribe} from "../../utils/eventBus";
 import {IN_GAME, LOOSE, PAUSED, RESTART, START, UPDATE_DIFFICULT} from "../../store/slices/gameSlice/consts";
 import {updateDistance, updateGameState, updateLife} from "../../store/slices/gameSlice";
@@ -13,6 +13,7 @@ function App() {
 	const gameState = useSelector((state) => state.game.current);
 	const life = useSelector((state) => state.game.life);
 	const distance = useSelector((state) => Math.floor(state.game.distance));
+	const [prevDistanceStep, setPrevDistanceStep] = useState(0);
 
 	useEffect(() => {
 		import("../../controllers/game")
@@ -44,8 +45,9 @@ function App() {
 	}, []);
 
 	useEffect(() => {
-		if (distance % 100 === 1) {
+		if (Math.floor(distance / 100) > prevDistanceStep) {
 			broadcast(UPDATE_DIFFICULT, 0.5);
+			setPrevDistanceStep(Math.floor(distance / 100));
 		}
 	}, [distance]);
 

@@ -69,8 +69,7 @@ class Game {
 		});
 
 		subscribe(UPDATE_DIFFICULT, (delta) => {
-			if (this.speed < 12) this.speed += delta
-			;
+			if (this.speed < 12) this.speed += delta;
 		});
 
 		subscribe(INIT_END, () => {
