@@ -37,7 +37,7 @@ function App() {
 		});
 
 		return () => {
-			if (game) game.current.destroyGame();
+			if (game.current) game.current.destroyGame();
 			unsubscribeUpdateState();
 			unsubscribeUpdateDistance();
 			unsubscribeUpdateLife();

@@ -35,6 +35,11 @@ class Game {
 	isPaused = false;
 	speed = 2;
 
+
+	constructor() {
+		this.resizeCanvas = this.resizeCanvas.bind(this);
+	}
+
 	addTarget(targetElement) {
 		this.target = targetElement;
 	}
@@ -106,20 +111,34 @@ class Game {
 	};
 
 	initCanvas(targetElement) {
+
 		this.app = new PIXI.Application({
 			backgroundColor: 0x333333,
 			width: targetElement.clientWidth,
 			height: targetElement.clientHeight
 		});
-		const canvas = this.app.renderer.view;
-		const scale = window.devicePixelRatio;
 
-		canvas.width *= scale;
-		canvas.height *= scale;
-
-		this.app.stage.sortableChildren = true;
 
 		targetElement.appendChild(this.app.view);
+
+		this.app.stage.sortableChildren = true;
+		this.app.renderer.options.resolution = window.devicePixelRatio;
+		this.app.renderer.options.autoDensity = true;
+		this.resizeCanvas();
+	}
+
+	resizeCanvas() {
+		const canvas = this.app.renderer.view;
+		const {clientWidth: width, clientHeight: height} = this.target;
+		this.app.renderer.resize(width * window.devicePixelRatio, height * window.devicePixelRatio);
+		canvas.style.width = `${width}px`;
+		canvas.style.height = `${height}px`;
+
+		const scaleX = width / 660;
+		console.log(scaleX * 880 - height * window.devicePixelRatio)
+		this.app.stage.scale.set(scaleX);
+		this.app.stage.y = height * window.devicePixelRatio - scaleX * 880 ;
+		//this.app.stage.scale.set(scale, scale);
 	}
 
 	initInteraction() {
@@ -251,12 +270,7 @@ class Game {
 	}
 
 	initOnResize() {
-		this.onWindowResize = () => {
-			this.app.view.width = this.target.innerWidth;
-			this.app.view.height = this.target.innerHeight;
-		};
-
-		window.addEventListener("resize", this.onWindowResize);
+		window.addEventListener("resize", this.resizeCanvas);
 	}
 
 	destroyGame() {
